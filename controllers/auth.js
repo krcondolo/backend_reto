@@ -98,8 +98,25 @@ const reToken = async (req, res = response) => {
     })
 }
 
+const getAllUsers = async (req, res) => {
+    try {
+      const users = await Usuario.find({})
+      res.json({
+        ok: true,
+        users
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({
+        ok: false,
+        msg: 'Por favor comuníquese con TI'
+      })
+    }
+  }
+
 module.exports = {
     createUser,
     logUser,
-    reToken
+    reToken,
+    getAllUsers
 }
