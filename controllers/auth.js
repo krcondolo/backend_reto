@@ -110,7 +110,7 @@ const getAllUsers = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    const { userId } = req.params;
+    const { userId } = req.body;
     try {
         // Buscar y eliminar usuario
         const usuario = await Usuario.findByIdAndDelete(userId);
@@ -135,8 +135,7 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { userId } = req.params;
-    const { name, email, password } = req.body;
+    const { userId, name, email, password } = req.body;
     try {
         // Buscar usuario y actualizar datos
         let usuario = await Usuario.findByIdAndUpdate(
