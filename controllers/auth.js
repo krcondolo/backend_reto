@@ -135,12 +135,12 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { userId, name, email, password } = req.body;
+    const { userId, name, email, password, user_type } = req.body;
     try {
         // Buscar usuario y actualizar datos
         let usuario = await Usuario.findByIdAndUpdate(
             userId,
-            { name, email, password },
+            { name, email, password, user_type },
             { new: true }
         );
         if (!usuario) {
