@@ -14,7 +14,13 @@ const UsuarioSchema = Schema({
         type: String,
         require: true
     },
-
+    user_type: {
+        type: String,
+        require: true
+    },
 })
+
+
+
 
 module.exports = model('Usuario', UsuarioSchema);

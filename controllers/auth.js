@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs')
 const Usuario = require('../models/Usuario')
 const { generateJWT } = require('../helpers/JWT')
 const createUser = async (req, res = response) => {
-    const { email, password } = req.body
+    const { email, password, user_type } = req.body
     try {
         let usuario = await Usuario.findOne({ email })
         if (usuario) {
@@ -28,9 +28,9 @@ const createUser = async (req, res = response) => {
             ok: true,
             uid: usuario.id,
             name: usuario.name,
+            user_type,
             token
         })
-
     } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -38,11 +38,6 @@ const createUser = async (req, res = response) => {
             msg: 'Por favor comuníquese con TI'
         })
     }
-
-    //destructure body
-    // const { name, email, password } = req.body
-
-
 }
 const logUser = async (req, res = response) => {
     //destructure body
@@ -100,23 +95,79 @@ const reToken = async (req, res = response) => {
 
 const getAllUsers = async (req, res) => {
     try {
-      const users = await Usuario.find({})
-      res.json({
-        ok: true,
-        users
-      })
+        const users = await Usuario.find({})
+        res.json({
+            ok: true,
+            users
+        })
     } catch (error) {
-      console.log(error)
-      res.status(500).json({
-        ok: false,
-        msg: 'Por favor comuníquese con TI'
-      })
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        })
     }
-  }
+}
 
+const deleteUser = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        // Buscar y eliminar usuario
+        const usuario = await Usuario.findByIdAndDelete(userId);
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+        // Respuesta
+        res.json({
+            ok: true,
+            msg: 'Usuario eliminado correctamente'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
+    }
+};
+
+const updateUser = async (req, res) => {
+    const { userId } = req.params;
+    const { name, email, password } = req.body;
+    try {
+        // Buscar usuario y actualizar datos
+        let usuario = await Usuario.findByIdAndUpdate(
+            userId,
+            { name, email, password },
+            { new: true }
+        );
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+        // Respuesta
+        res.json({
+            ok: true,
+            usuario
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
+    }
+};
 module.exports = {
     createUser,
     logUser,
     reToken,
-    getAllUsers
+    getAllUsers,
+    deleteUser,
+    updateUser
 }
