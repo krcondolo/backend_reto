@@ -7,13 +7,20 @@ const { validateJWT } = require('../middlewares/validateJWT');
 
 router.post('/new',
     [
-        //middlewares
-        check('name', 'Tha name is required').not().isEmpty(), validateFields,
-        check('user_type', 'The user_type is required').not().isEmpty(), validateFields,
-        check('email', 'The email is required').not().isEmpty(), validateFields,
-        check('password', 'The password is required').not().isEmpty(), validateFields,
+        check('name', 'The name is required').not().isEmpty(),
+        check('user_type', 'The user_type is required').not().isEmpty(),
+        check('user_type', 'El tipo de usuario solo puede ser `admin` o `normal` ').custom((value) => {
+            if (value !== 'admin' && value !== 'normal') {
+                throw new Error('Invalid user_type');
+            }
+            return true;
+        }),
+        check('email', 'The email is required').not().isEmpty(),
+        check('password', 'The password is required').not().isEmpty(),
+        validateFields
     ],
-    createUser)
+    createUser
+);
 router.post('/', logUser)
 router.get('/renew', validateJWT, reToken)
 router.get('/getUsers', getAllUsers)
@@ -23,6 +30,12 @@ router.post('/updateUser',
         //middlewares
         check('name', 'Tha name is required').not().isEmpty(), validateFields,
         check('user_type', 'The user_type is required').not().isEmpty(), validateFields,
+        check('user_type', 'El tipo de usuario solo puede ser `admin` o `normal` ').custom((value) => {
+            if (value !== 'admin' && value !== 'normal') {
+                throw new Error('Invalid user_type');
+            }
+            return true;
+        }),
         check('email', 'The email is required').not().isEmpty(), validateFields,
         check('password', 'The password is required').not().isEmpty(), validateFields,
     ],
