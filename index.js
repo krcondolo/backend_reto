@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 //database
 dbConnection()
-//CORS
+//CORS  
 app.use(cors())
 //public dir
 app.use(express.static('public'))
