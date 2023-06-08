@@ -13,7 +13,7 @@ router.post('/newAcc',
         check('client', 'The user_type is required').not().isEmpty(), validateFields,
         check('respons_oper', 'The email is required').not().isEmpty(), validateFields,
         check('cons_equ', 'The password is required').not().isEmpty(), validateFields,
-    ],
+    ], 
     createAccount)
 
 
