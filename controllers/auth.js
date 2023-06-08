@@ -40,47 +40,41 @@ const createUser = async (req, res = response) => {
     }
 }
 const logUser = async (req, res = response) => {
-    //destructure body
-    const { email, password } = req.body
+    const { email, password } = req.body;
     try {
-        //validar user
-        let usuario = await Usuario.findOne({ email })
+        let usuario = await Usuario.findOne({ email });
         if (!usuario) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Usuario no encontrado'
-            })
+            });
         }
-        //validar password
-        const validPassword = bcrypt.compareSync(password, usuario.password)
 
+        const validPassword = bcrypt.compareSync(password, usuario.password);
         if (!validPassword) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Password incorrecto'
-            })
+            });
         }
 
-        //JWT for user
-        const token = await generateJWT(usuario.id, usuario.name)
-        //
+        const token = await generateJWT(usuario.id, usuario.name);
+
         res.json({
             ok: true,
             uid: usuario.id,
             name: usuario.name,
+            user_type: usuario.user_type, // Include the user_type in the response
             token
-
-        })
-
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Por favor comuníquese con TI'
-        })
+        });
     }
-
-}
+};
 const reToken = async (req, res = response) => {
     const { uid, name } = req;
     const token = await generateJWT(uid, name)
@@ -137,19 +131,30 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
     const { userId, name, email, password, user_type } = req.body;
     try {
-        // Buscar usuario y actualizar datos
-        let usuario = await Usuario.findByIdAndUpdate(
-            userId,
-            { name, email, password, user_type },
-            { new: true }
-        );
+        // Find the user by ID
+        let usuario = await Usuario.findById(userId);
         if (!usuario) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Usuario no encontrado'
             });
         }
-        // Respuesta
+
+        // Update the user data
+        usuario.name = name;
+        usuario.email = email;
+        usuario.user_type = user_type;
+
+        // Encrypt the password if provided
+        if (password) {
+            const salt = bcrypt.genSaltSync();
+            usuario.password = bcrypt.hashSync(password, salt);
+        }
+
+        // Save the updated user
+        await usuario.save();
+
+        // Response
         res.json({
             ok: true,
             usuario

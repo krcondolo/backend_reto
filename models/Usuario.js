@@ -19,8 +19,4 @@ const UsuarioSchema = Schema({
         require: true
     },
 })
-
-
-
-
 module.exports = model('Usuario', UsuarioSchema);
