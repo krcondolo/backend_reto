@@ -144,12 +144,9 @@ const updateUser = async (req, res) => {
         usuario.name = name;
         usuario.email = email;
         usuario.user_type = user_type;
+        const salt = bcrypt.genSaltSync();
+        usuario.password = bcrypt.hashSync(password, salt);
 
-        // Encrypt the password if provided
-        if (password) {
-            const salt = bcrypt.genSaltSync();
-            usuario.password = bcrypt.hashSync(password, salt);
-        }
 
         // Save the updated user
         await usuario.save();
