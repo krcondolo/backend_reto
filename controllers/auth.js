@@ -39,51 +39,6 @@ const createUser = async (req, res = response) => {
         })
     }
 }
-const updateUser = async (req, res) => {
-    const { userId, name, email, password, user_type } = req.body;
-    try {
-        // Buscar el usuario por su ID
-        let usuario = await Usuario.findById(userId);
-        if (!usuario) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'Usuario no encontrado'
-            });
-        }
-
-        // Actualizar los datos del usuario
-        usuario.name = name;
-        usuario.email = email;
-
-        // Validar y actualizar user_type
-        if (user_type !== 'admin' && user_type !== 'normal') {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Tipo de usuario inválido'
-            });
-        }
-        usuario.user_type = user_type;
-
-        // Encriptar la contraseña
-        const salt = bcrypt.genSaltSync();
-        usuario.password = bcrypt.hashSync(password, salt);
-
-        // Guardar el usuario actualizado
-        await usuario.save();
-
-        // Respuesta
-        res.json({
-            ok: true,
-            usuario
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Por favor comuníquese con TI'
-        });
-    }
-};
 const logUser = async (req, res = response) => {
     const { email, password } = req.body;
     try {
@@ -173,6 +128,41 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    const { userId, name, email, password, user_type } = req.body;
+    try {
+        // Find the user by ID
+        let usuario = await Usuario.findById(userId);
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        // Update the user data
+        usuario.name = name;
+        usuario.email = email;
+        usuario.user_type = user_type;
+        usuario.password = password;
+
+
+        // Save the updated user
+        await usuario.save();
+
+        // Response
+        res.json({
+            ok: true,
+            usuario
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
+    }
+};
 module.exports = {
     createUser,
     logUser,
