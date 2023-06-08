@@ -131,39 +131,51 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
     const { userId, name, email, password, user_type } = req.body;
     try {
-        // Find the user by ID
-        let usuario = await Usuario.findById(userId);
-        if (!usuario) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'Usuario no encontrado'
-            });
-        }
-
-        // Update the user data
-        usuario.name = name;
-        usuario.email = email;
-        usuario.password = password;
-        usuario.user_type = user_type;
-
-
-
-        // Save the updated user
-        await usuario.save();
-
-        // Response
-        res.json({
-            ok: true,
-            usuario
+      // Find the user by ID
+      let usuario = await Usuario.findById(userId);
+      if (!usuario) {
+        return res.status(404).json({
+          ok: false,
+          msg: 'Usuario no encontrado'
         });
+      }
+  
+      // Check if the email is already used by another user
+      const existingUser = await Usuario.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== userId) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'El correo electrónico ya está en uso por otro usuario'
+        });
+      }
+  
+      // Update the user data
+      usuario.name = name;
+      usuario.email = email;
+      usuario.user_type = user_type;
+  
+      // Only update the password if a new password is provided
+      if (password) {
+        const salt = bcrypt.genSaltSync();
+        usuario.password = bcrypt.hashSync(password, salt);
+      }
+  
+      // Save the updated user
+      await usuario.save();
+  
+      // Response
+      res.json({
+        ok: true,
+        usuario
+      });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Por favor comuníquese con TI'
-        });
+      console.log(error);
+      res.status(500).json({
+        ok: false,
+        msg: 'Por favor comuníquese con TI'
+      });
     }
-};
+  };
 module.exports = {
     createUser,
     logUser,

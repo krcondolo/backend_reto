@@ -29,15 +29,14 @@ router.post('/updateUser',
     [
         //middlewares
         check('name', 'Tha name is required').not().isEmpty(), validateFields,
-        check('user_type', 'The user_type is required').not().isEmpty(), validateFields,
+        check('email', 'The email is required').not().isEmpty(), validateFields,
+        check('password', 'The password is required').not().isEmpty(), validateFields,
         check('user_type', 'El tipo de usuario solo puede ser `admin` o `normal` ').custom((value) => {
             if (value !== 'admin' && value !== 'normal') {
                 throw new Error('El tipo de usuario solo puede ser `admin` o `normal');
             }
             return true;
         }),
-        check('email', 'The email is required').not().isEmpty(), validateFields,
-        check('password', 'The password is required').not().isEmpty(), validateFields,
     ],
     updateUser)
 
