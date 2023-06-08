@@ -15,7 +15,8 @@ app.use(express.json())
 
 //auth routes
 app.use('/api/auth', require('./routes/auth'))
-
+//accotuns
+app.use('/api/accounts', require('./routes/accounts'))
 //requests
 app.listen(process.env.PORT, () => {
     console.log(`Group MIND server is running on port ${process.env.PORT}`)
