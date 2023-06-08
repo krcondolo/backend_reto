@@ -143,8 +143,9 @@ const updateUser = async (req, res) => {
         // Update the user data
         usuario.name = name;
         usuario.email = email;
-        usuario.user_type = user_type;
         usuario.password = password;
+        usuario.user_type = user_type;
+
 
 
         // Save the updated user

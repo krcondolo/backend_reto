@@ -11,7 +11,7 @@ router.post('/new',
         check('user_type', 'The user_type is required').not().isEmpty(),
         check('user_type', 'El tipo de usuario solo puede ser `admin` o `normal` ').custom((value) => {
             if (value !== 'admin' && value !== 'normal') {
-                throw new Error('Invalid user_type');
+                throw new Error('El tipo de usuario solo puede ser `admin` o `normal');
             }
             return true;
         }),
@@ -32,7 +32,7 @@ router.post('/updateUser',
         check('user_type', 'The user_type is required').not().isEmpty(), validateFields,
         check('user_type', 'El tipo de usuario solo puede ser `admin` o `normal` ').custom((value) => {
             if (value !== 'admin' && value !== 'normal') {
-                throw new Error('Invalid user_type');
+                throw new Error('El tipo de usuario solo puede ser `admin` o `normal');
             }
             return true;
         }),
