@@ -1,0 +1,31 @@
+{
+  "name": "backend_reto",
+  "version": "1.0.0",
+  "description": "Servicio node que será el backend para el proyecto del reto MIND, contiene las rutas, rest y conexión a BD",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krcondolo/backend_reto.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/krcondolo/backend_reto/issues"
+  },
+  "homepage": "https://github.com/krcondolo/backend_reto#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
+    "mongoose": "^7.2.1"
+  }
+}
