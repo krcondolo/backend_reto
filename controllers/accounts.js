@@ -161,7 +161,14 @@ const addMovement = async (req, res = response) => {
         // Agregar el movimiento al usuario
         usuario.movements.push(movimiento);
         await usuario.save();
+        // Guardar el movimiento
+        await movimiento.save();
 
+        // Respuesta
+        res.status(201).json({
+            ok: true,
+            movimiento
+        });
         // Registrar la acción en el log
         const log = new Logs({
             action: 'new',
