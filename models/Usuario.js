@@ -18,6 +18,18 @@ const UsuarioSchema = Schema({
         type: String,
         require: true
     },
+    english_level: {
+        type: String,
+        require: true
+    },
+    con_tecn: {
+        type: String,
+        require: true
+    },
+    link_cv: {
+        type: String,
+        require: true
+    },
     // otros campos del esquema
     movements: [{
         type: Schema.Types.ObjectId,

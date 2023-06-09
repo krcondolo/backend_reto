@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs')
 const Usuario = require('../models/Usuario')
 const { generateJWT } = require('../helpers/JWT')
 const createUser = async (req, res = response) => {
-    const { email, password, user_type } = req.body
+    const { email, password, user_type, english_level, con_tecn, link_cv } = req.body
     try {
         let usuario = await Usuario.findOne({ email })
         if (usuario) {
@@ -29,6 +29,9 @@ const createUser = async (req, res = response) => {
             uid: usuario.id,
             name: usuario.name,
             user_type,
+            english_level,
+            con_tecn,
+            link_cv,
             token
         })
     } catch (error) {
@@ -129,53 +132,55 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { userId, name, email, password, user_type } = req.body;
+    const { userId, name, email, password, user_type, english_level, con_tecn, link_cv } = req.body;
     try {
-      // Find the user by ID
-      let usuario = await Usuario.findById(userId);
-      if (!usuario) {
-        return res.status(404).json({
-          ok: false,
-          msg: 'Usuario no encontrado'
+        // Find the user by ID
+        let usuario = await Usuario.findById(userId);
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        // Check if the email is already used by another user
+        const existingUser = await Usuario.findOne({ email });
+        if (existingUser && existingUser._id.toString() !== userId) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'El correo electrónico ya está en uso por otro usuario'
+            });
+        }
+
+        // Update the user data
+        usuario.name = name;
+        usuario.email = email;
+        usuario.user_type = user_type;
+        usuario.english_level = english_level;
+        usuario.con_tecn = con_tecn;
+        usuario.link_cv = link_cv;
+        // Only update the password if a new password is provided
+        if (password) {
+            const salt = bcrypt.genSaltSync();
+            usuario.password = bcrypt.hashSync(password, salt);
+        }
+
+        // Save the updated user
+        await usuario.save();
+
+        // Response
+        res.json({
+            ok: true,
+            usuario
         });
-      }
-  
-      // Check if the email is already used by another user
-      const existingUser = await Usuario.findOne({ email });
-      if (existingUser && existingUser._id.toString() !== userId) {
-        return res.status(400).json({
-          ok: false,
-          msg: 'El correo electrónico ya está en uso por otro usuario'
-        });
-      }
-  
-      // Update the user data
-      usuario.name = name;
-      usuario.email = email;
-      usuario.user_type = user_type;
-  
-      // Only update the password if a new password is provided
-      if (password) {
-        const salt = bcrypt.genSaltSync();
-        usuario.password = bcrypt.hashSync(password, salt);
-      }
-  
-      // Save the updated user
-      await usuario.save();
-  
-      // Response
-      res.json({
-        ok: true,
-        usuario
-      });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        ok: false,
-        msg: 'Por favor comuníquese con TI'
-      });
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
     }
-  };
+};
 module.exports = {
     createUser,
     logUser,
