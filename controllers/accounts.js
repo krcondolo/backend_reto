@@ -184,10 +184,29 @@ const addMovement = async (req, res = response) => {
     }
 };
 
+const getAllLogs = async (req, res) => {
+    try {
+        const logs = await Logs.find({});
+        res.json({
+            ok: true,
+            logs
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
+    }
+};
+
+
+
 module.exports = {
     createAccount,
     getAllAcounts,
     deleteAccount,
     updateAccount,
-    addMovement
+    addMovement,
+    getAllLogs
 };

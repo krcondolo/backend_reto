@@ -3,7 +3,7 @@ const { check } = require('express-validator')
 const router = Router();
 const { validateFields } = require('../middlewares/validateFields');
 const { validateJWT } = require('../middlewares/validateJWT');
-const { createAccount, deleteAccount, getAllAcounts, updateAccount, addMovement } = require('../controllers/accounts');
+const { createAccount, deleteAccount, getAllAcounts, updateAccount, addMovement, getAllLogs } = require('../controllers/accounts');
 
 
 router.post('/newAcc',
@@ -17,6 +17,7 @@ router.post('/newAcc',
     createAccount)
 router.post('/deleteAcc', deleteAccount)
 router.post('/getAcc', getAllAcounts)
+router.post('/getLogs', getAllLogs)
 router.post('/updAcc',
     [
         //middlewares
