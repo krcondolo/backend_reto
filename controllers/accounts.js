@@ -1,22 +1,35 @@
-const { response } = require('express')
-const { validationResult } = require('express-validator')
-const bcrypt = require('bcryptjs')
-//TO DO: validations like min and max chars
-const Cuentas = require('../models/Cuentas')
-const { generateJWT } = require('../helpers/JWT')
+const { response } = require('express');
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const Cuentas = require('../models/Cuentas');
+const { generateJWT } = require('../helpers/JWT');
+const Movimientos = require('../models/Movimientos');
+const Usuario = require('../models/Usuario');
+const Logs = require('../models/Logs');
+const moment = require('moment/moment');
+
 const createAccount = async (req, res = response) => {
-    const { name, client, respons_oper, cons_equ } = req.body
+    const { name, client, respons_oper, cons_equ } = req.body;
     try {
-        let cuenta = await Cuentas.findOne({ name })
+        let cuenta = await Cuentas.findOne({ name });
         if (cuenta) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Una cuenta ya tiene ese nombre'
-            })
+            });
         }
-        cuenta = new Cuentas(req.body)
-        await cuenta.save()
-        //response
+        cuenta = new Cuentas(req.body);
+        await cuenta.save();
+
+        // Registrar la acción en el log
+        const log = new Logs({
+            action: 'Nueva cuenta creada',
+            descr: client,
+            userId: cuenta._id
+        });
+        await log.save();
+
+        // Respuesta
         res.status(201).json({
             ok: true,
             uid: cuenta.id,
@@ -24,31 +37,31 @@ const createAccount = async (req, res = response) => {
             client,
             respons_oper,
             cons_equ
-        })
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Por favor comuníquese con TI'
-        })
+        });
     }
-}
+};
 
 const getAllAcounts = async (req, res) => {
     try {
-        const cuentas = await Cuentas.find({})
+        const cuentas = await Cuentas.find({});
         res.json({
             ok: true,
             cuentas
-        })
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Por favor comuníquese con TI'
-        })
+        });
     }
-}
+};
 
 const deleteAccount = async (req, res) => {
     const { accountId } = req.body;
@@ -58,13 +71,21 @@ const deleteAccount = async (req, res) => {
         if (!cuenta) {
             return res.status(404).json({
                 ok: false,
-                msg: 'cuenta no encontrada'
+                msg: 'Cuenta no encontrada'
             });
         }
+
+        const log = new Logs({
+            action: 'delete',
+            descr: `Se eliminó la cuenta ${accountId}`,
+            userId: accountId
+        });
+        await log.save();
+
         // Respuesta
         res.json({
             ok: true,
-            msg: 'cuenta eliminada correctamente'
+            msg: 'Cuenta eliminada correctamente'
         });
     } catch (error) {
         console.log(error);
@@ -87,9 +108,18 @@ const updateAccount = async (req, res) => {
         if (!cuenta) {
             return res.status(404).json({
                 ok: false,
-                msg: 'cuenta no encontrada'
+                msg: 'Cuenta no encontrada'
             });
         }
+
+        // Registrar la acción en el log
+        const log = new Logs({
+            action: 'update',
+            descr: client,
+            userId: accountId
+        });
+        await log.save();
+
         // Respuesta
         res.json({
             ok: true,
@@ -103,9 +133,61 @@ const updateAccount = async (req, res) => {
         });
     }
 };
+
+const addMovement = async (req, res = response) => {
+    const { userId, startDate, endDate, description } = req.body;
+    try {
+        // Buscar el usuario por ID
+        const usuario = await Usuario.findById(userId);
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        // Formatear las fechas utilizando moment.js
+        const formattedStartDate = moment(startDate, 'DD-MM-YYYY').toDate();
+        const formattedEndDate = moment(endDate, 'DD-MM-YYYY').toDate();
+
+        // Crear el nuevo movimiento
+        const movimiento = new Movimientos({
+            userId,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate,
+            description
+        });
+
+        // Agregar el movimiento al usuario
+        usuario.movements.push(movimiento);
+        await usuario.save();
+
+        // Registrar la acción en el log
+        const log = new Logs({
+            action: 'new',
+            descr: description,
+            userId: userId
+        });
+        await log.save();
+
+        // Respuesta
+        res.status(201).json({
+            ok: true,
+            movimiento
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor comuníquese con TI'
+        });
+    }
+};
+
 module.exports = {
     createAccount,
     getAllAcounts,
     deleteAccount,
-    updateAccount
-}
+    updateAccount,
+    addMovement
+};

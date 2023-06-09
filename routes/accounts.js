@@ -3,7 +3,7 @@ const { check } = require('express-validator')
 const router = Router();
 const { validateFields } = require('../middlewares/validateFields');
 const { validateJWT } = require('../middlewares/validateJWT');
-const { createAccount, deleteAccount, getAllAcounts, updateAccount } = require('../controllers/accounts');
+const { createAccount, deleteAccount, getAllAcounts, updateAccount, addMovement } = require('../controllers/accounts');
 
 
 router.post('/newAcc',
@@ -26,4 +26,16 @@ router.post('/updAcc',
         check('cons_equ', 'The cons_equ is required').not().isEmpty(), validateFields,
     ],
     updateAccount)
+
+router.post('/addMovement',
+    [
+        //middlewares
+        check('userId', 'The userId is required').not().isEmpty(),
+        check('startDate', 'The startDate is required').not().isEmpty(),
+        check('endDate', 'The endDate is required').not().isEmpty(),
+        check('description', 'The description is required').not().isEmpty(),
+        validateFields
+    ],
+    addMovement
+);
 module.exports = router; 

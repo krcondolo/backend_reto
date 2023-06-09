@@ -18,5 +18,10 @@ const UsuarioSchema = Schema({
         type: String,
         require: true
     },
+    // otros campos del esquema
+    movements: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Movimientos'
+    }]
 })
 module.exports = model('Usuario', UsuarioSchema);
